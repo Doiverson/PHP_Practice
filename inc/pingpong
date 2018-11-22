@@ -1,0 +1,8 @@
+<?php
+    $player1 = 0;
+    $player2 = 0;
+    $round = 0;
+
+    while (abs($player1 - $player2)<2 || $player1 < 11 && $player2 < 11) {
+
+    }
