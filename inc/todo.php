@@ -1,16 +1,42 @@
 <?php
 include 'list.php';
 
-$status = 'false';
-$filter = array();
-foreach ($list as $key => $item) {
-    if ($status === 'all' || !$item['complete'] == $status) {
-        $filter[] = $key;
+$status = 'all';
+$field = 'priority';
+$action = 'week';
+
+$order = array();
+if ($status == 'all') {
+    $order = array_keys($list);
+} else {
+    foreach ($list as $key => $item) {
+        if ($item['complete'] == $status) {
+            $order[] = $key;
+        }
     }
 }
 
-echo '<pre>';
-var_dump($filter, boolval('all'), $status == 'all');
+switch ($action) {
+    case 'sort':
+        if ($field) {
+            $sort = array();
+            foreach ($order as $id) {
+                $sort[$id] = $list[$id][$field];
+            }
+            asort($sort);
+            $order = array_keys($sort);
+        }
+        break;
+    case 'week':
+        foreach ($order as $key => $value) {
+            if (strtotime($list[$value]['due']) > strtotime("+1 week") || !$list[$value]['due']) {
+                unset($order[$key]);
+            }
+        }
+        break;
+}
+//var_dump($sort);
+//var_dump($list);
 
 echo '<table>';
 echo '<tr>';
@@ -19,19 +45,21 @@ echo '<th>Priority</th>';
 echo '<th>Due Date</th>';
 echo '<th>Complete</th>';
 echo '</tr>';
-
-foreach ($list as $item) {
-        echo '<tr>';
-        echo '<td>' . $item['title'] . "</td>\n";
-        echo '<td>' . $item['priority'] . "</td>\n";
-        echo '<td>' . $item['due'] . "</td>\n";
-        echo '<td>';
-        if ($item['complete']) {
-            echo 'Yes';
-        } else {
-            echo 'No';
-        }
-        echo "</td>\n";
-        echo '</tr>';
+foreach ($order as $id) {
+    echo '<tr>';
+    echo '<td>' . $list[$id]['title'] . "</td>\n";
+    echo '<td>' . $list[$id]['priority'] . "</td>\n";
+    echo '<td>' . $list[$id]['due'] . "</td>\n";
+    echo '<td>';
+    if ($list[$id]['complete']) {
+        echo 'Yes';
+    } else {
+        echo 'No';
+    }
+    echo "</td>\n";
+    echo '</tr>';
 }
 echo '</table>';
+//var_dump($list);
+//echo $list[0]['title'];
+?>
